@@ -3,3 +3,7 @@ arduino:
   baudrate: 57600
   dht:
     sampling_time: 2 # s
+
+app:
+  dht:
+    sampling_time: 2 # s
