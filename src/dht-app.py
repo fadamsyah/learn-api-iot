@@ -13,6 +13,12 @@ cfg_dht = config['dht']
 
 st.title("Web App for Monitoring Temperature & Humidity using Pyserial, RabbitMQ, and Streamlit")
 
+dht_interval = st.text_input("DHT Plot Interval (s)", "10")
+try:
+    dht_interval = int(dht_interval)
+except:
+    dht_interval = 10
+
 hum_placeholder  = st.empty()
 temp_placeholder = st.empty()
 
@@ -33,7 +39,7 @@ while True:
         dht_t_last = time.time()
         
         t_end   = datetime.now()
-        t_start = t_end - timedelta(seconds = 100)
+        t_start = t_end - timedelta(seconds = dht_interval)
         t_end   = t_end.strftime("%Y-%m-%d %H:%M:%S")
         t_start = t_start.strftime("%Y-%m-%d %H:%M:%S")
         
@@ -47,15 +53,15 @@ while True:
         cur_min_temp = min(cur_min_temp, min(result['list_celcius']))
         
         temp_ax.cla()
-        temp_ax.set_xlabel("Time")
+        temp_ax.set_xlabel("Relative Time (s)")
         temp_ax.set_ylabel('Temperature (C)')
         temp_ax.set_ylim([cur_min_temp - 0.5, cur_max_temp + 0.5])
-        temp_ax.plot(result['list_time'], result['list_celcius'])
-        temp_placeholder.pyplot(temp_fig)
+        temp_ax.plot(result['list_time_x'], result['list_celcius'])
+        temp_placeholder.write(temp_fig)
         
         hum_ax.cla()
-        hum_ax.set_xlabel("Time")
+        hum_ax.set_xlabel("Relative Time (s)")
         hum_ax.set_ylabel("Humidity")
         hum_ax.set_ylim([cur_min_hum - 0.5, cur_max_hum + 0.5])
-        hum_ax.plot(result['list_time'], result['list_humidity'])
-        hum_placeholder.pyplot(hum_fig)
+        hum_ax.plot(result['list_time_x'], result['list_humidity'])
+        hum_placeholder.write(hum_fig)

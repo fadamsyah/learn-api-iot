@@ -12,7 +12,7 @@ LIST_CELCIUS  = []
 LIST_HUMIDITY = []
 
 def callback(ch, method, properties, body):
-    global DATA
+    global LIST_TIME, LIST_TIME_RAW, LIST_CELCIUS, LIST_HUMIDITY
     
     msg = body.decode()
     now, status, humidity, celcius = msg.split('|')
@@ -75,15 +75,23 @@ def get_dht():
             'list_time_raw': [],
             'list_celcius' : [],
             'list_humidity': [],
+            'list_time_x'  : [],
         }), 200
     
     i_start, i_end = find_start_and_end_index(LIST_TIME, t_start, t_end)
     
+    list_time_raw = LIST_TIME_RAW[i_start:i_end]
+    
+    _last_time_x = datetime.strptime(list_time_raw[-1], '%Y-%m-%d %H:%M:%S')
+    list_time_x  = map(lambda x: (datetime.strptime(x, '%Y-%m-%d %H:%M:%S') - _last_time_x).total_seconds(), list_time_raw)
+    list_time_x  = list(list_time_x)
+    
     result = {
         'list_time'    : LIST_TIME[i_start:i_end],
-        'list_time_raw': LIST_TIME_RAW[i_start:i_end],
+        'list_time_raw': list_time_raw,
         'list_celcius' : LIST_CELCIUS[i_start:i_end],
         'list_humidity': LIST_HUMIDITY[i_start:i_end],
+        'list_time_x'  : list_time_x,
     }
     
     return jsonify(result), 200
